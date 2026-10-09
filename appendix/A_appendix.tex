@@ -45,9 +45,9 @@ Table~\ref{tab:exploits} lists every route to an unearned pass that we observed 
 \toprule
 Exploit & What we saw & Countermeasure \\
 \midrule
-Fetching the fix from code hosts & With the network open, \netTrajOpen{} of \nTasks{} Opus~5 runs contacted code hosts and \netOwnRepoOpen{} downloaded the task's own repository; \webFetchTrajOpen{} used the scaffold's web-fetch tool, \webFetchOwnOpen{} of them on their own repository. & Only the model endpoint is reachable in the agent phase; scaffold web tools are disabled; the lock is probed before every run. \\
+Fetching the fix from code hosts & With the network open, 32 of 642 Opus~5 runs contacted code hosts and 25 downloaded the task's own repository; 13 used the scaffold's web-fetch tool, 11 of them on their own repository. & Only the model endpoint is reachable in the agent phase; scaffold web tools are disabled; the lock is probed before every run. \\
 \addlinespace
-Recovering the fix from git history & Future commits left in task images leaked fixes in SWE-bench and SWE-Bench Pro \citep{kahn2025repostate,needham2025prostate,adams2026gitreward}. & All \probeImages{} images contain neither the fixing commit nor reflog entries, stashes or dangling objects; re-checked by the probe. \\
+Recovering the fix from git history & Future commits left in task images leaked fixes in SWE-bench and SWE-Bench Pro \citep{kahn2025repostate,needham2025prostate,adams2026gitreward}. & All 642 images contain neither the fixing commit nor reflog entries, stashes or dangling objects; re-checked by the probe. \\
 \addlinespace
 Tunnelling through the model endpoint & Gemini disguised a request to the Go module proxy as model-endpoint traffic. & The allowlist names the endpoint hostname alone, and the endpoint relays no other traffic; all tool calls are audited. \\
 \addlinespace
@@ -59,7 +59,7 @@ Tampering with the grader & A scripted agent that replaces \texttt{python3} with
 \addlinespace
 Changing graded test files & Agents edited snapshots and test data that the hidden test patch owns (in 44 runs this made the patch fail to apply), and a \texttt{git stash} round trip left stale bytecode that the verifier imported. & Test files, test data and bytecode are reset before grading (\S\ref{sec:verifier}). \\
 \addlinespace
-Imitating a missing SDK inside the patch & On the never-public set, three systems wrote an imitation SDK into the patch for two tasks whose images lack it; \nFakeSDK{} passes, because the tests mock the client. & Not caught by re-grading; the patch audit flags large new directories that imitate a third-party SDK. \\
+Imitating a missing SDK inside the patch & On the never-public set, three systems wrote an imitation SDK into the patch for two tasks whose images lack it; 5 passes, because the tests mock the client. & Not caught by re-grading; the patch audit flags large new directories that imitate a third-party SDK. \\
 \addlinespace
 Reading hidden tests or the reference & On the never-public set, the verifier configuration carried the reference and test patches. & Removed from the bundle; trajectories are audited for reads of \texttt{/tests} and \texttt{/solution}. \\
 \bottomrule
@@ -70,11 +70,11 @@ Reading hidden tests or the reference & On the never-public set, the verifier co
 
 \section{The Hard Split}
 \label{app:hard}
-The \nHard{} tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families (Opus~5, GLM-5.3, Kimi K3, Inkling, Gemini~3.8 Flash) failed it. That gave \nHardCandidates{} candidates after excluding \nHardDefectDrop{} tasks with verified defects, and \nHardAuditDrop{} more were removed after review. Every Hard task passes with its reference solution and fails with an empty patch. We note four properties of the released list.
+The 51 tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families (Opus~5, GLM-5.3, Kimi K3, Inkling, Gemini~3.8 Flash) failed it. That gave 54 candidates after excluding 3 tasks with verified defects, and 3 more were removed after review. Every Hard task passes with its reference solution and fails with an empty patch. We note four properties of the released list.
 \begin{itemize}\setlength\itemsep{0pt}
-\item \hardKimiOnly{} tasks qualify only through partner runs of Kimi K3.
-\item \hardRewritten{} of the \nHard{} instructions were edited after selection, against \otherRewritten{} elsewhere.
-\item One task (openlibrary \task{7cbfb812}) has a verified test defect, and one (ansible \task{40ade1f8}) has a timing-sensitive test.
+\item 14 tasks qualify only through partner runs of Kimi K3.
+\item 39 of the 51 instructions were edited after selection, against 190/591 elsewhere.
+\item One task (openlibrary \texttt{7cbfb812}) has a verified test defect, and one (ansible \texttt{40ade1f8}) has a timing-sensitive test.
 \item Every Hard task is solved by at least one of our runs.
 \end{itemize}
 
@@ -86,16 +86,16 @@ Table~\ref{tab:flips} lists every task whose grade in the agent's sandbox differ
 
 \section{The Never-Public Set}
 \label{app:private}
-The \nPriv{} tasks come from \nPrivOrgs{} organisations (\nPrivGo{} in Go, the rest in Python and JavaScript) whose code, to their knowledge, has never been on the open web. Table~\ref{tab:privdefects} lists the defects found while running it and their status. The instruction audit was done by an LLM judge (Claude Opus~5) that saw the instruction, the hidden tests and the reference solution but no model output. We checked eight of its judgments by hand. Its grades are noisy: it agreed with itself on \privJudgeAgree\% of re-judged unchanged tasks. On the final release, every system was run again with the same scaffold, effort and budget. With the imitation-SDK passes counted as failures, the scores are \privStrictOpusPct{} (Opus~5), \privStrictKimiPct{} (Kimi K3), \privStrictGlmPct{} (GLM-5.3), 86.0 (Gemini) and 79.0 (Inkling).
+The 272 tasks come from 4 organisations (154 in Go, the rest in Python and JavaScript) whose code, to their knowledge, has never been on the open web. Table~\ref{tab:privdefects} lists the defects found while running it and their status. The instruction audit was done by an LLM judge (Claude Opus~5) that saw the instruction, the hidden tests and the reference solution but no model output. We checked eight of its judgments by hand. Its grades are noisy: it agreed with itself on 71\% of re-judged unchanged tasks. On the final release, every system was run again with the same scaffold, effort and budget. With the imitation-SDK passes counted as failures, the scores are 92.6 (Opus~5), 87.5 (Kimi K3), 87.1 (GLM-5.3), 86.0 (Gemini) and 79.0 (Inkling).
 
 \input{tables/a10_private_defects}
 
 \section{Reproducibility}
 \label{app:repro}
-\paragraph{Harness.} Upstream Harbor \harborVersion{} on Modal \modalVersion{}. The network is set per phase: public during setup, only the model endpoint during the agent phase, public again for the verifier, because \nNeedNet{} tasks download dependencies while testing.
-\paragraph{Scaffolds.} Claude Code \ccVersion{} on the public runs and 2.1.283 on the private runs, with web tools disabled. Codex \codexVersion{}, with hosted web search disabled. mini-swe-agent 2.4.6, with no step or cost limit, so the time budget binds.
+\paragraph{Harness.} Upstream Harbor 0.22.0 on Modal 1.5.5. The network is set per phase: public during setup, only the model endpoint during the agent phase, public again for the verifier, because 32 tasks download dependencies while testing.
+\paragraph{Scaffolds.} Claude Code 2.1.278 on the public runs and 2.1.283 on the private runs, with web tools disabled. Codex 0.155.1, with hosted web search disabled. mini-swe-agent 2.4.6, with no step or cost limit, so the time budget binds.
 \paragraph{Budget and grading.} The budget is 3000\,s per task. The agent is stopped at 2940\,s, and the patch present then is graded. The patch is the staged \texttt{git diff} of the working tree. It is applied to a fresh container built from the task image, with a three-way fallback, and the unchanged verifier runs. When the sandbox grade and the clean grade disagree, two more clean grades are taken and the majority of the three clean grades counts.
-\paragraph{Cost.} Mean API spend per task on V2 was \costClaudeCode{} for the Claude Code runs, \costAstra{} for Astra and \costGemini{} for Gemini.
+\paragraph{Cost.} Mean API spend per task on V2 was \$2.9 for the Claude Code runs, \$2.3 for Astra and \$3 for Gemini.
 \paragraph{Release.} Task directories, the Hard split, the probe, capture and re-grade scripts, the exact harness flags, and per-task grades in both modes for every run.
 
 \section{Harness Study (Preliminary)}
@@ -108,11 +108,11 @@ The \nPriv{} tasks come from \nPrivOrgs{} organisations (\nPrivGo{} in Go, the r
 \toprule
 Model & mini-swe-agent & Pi & OpenCode \\
 \midrule
-GLM-5.3 & \hardGlmMini & \hardGlmPi & \hardGlmOpencode \\
-Kimi K3 & \hardKimiMini & \hardKimiPi & \hardKimiOpencode \\
-Inkling & \hardInklingMini & \hardInklingPi & \hardInklingOpencode \\
+GLM-5.3 & 43 & 44 & 44 \\
+Kimi K3 & 45 & 41 & 45 \\
+Inkling & 29 & 21 & 32 \\
 \bottomrule
 \end{tabular}
-\caption{Hard tasks resolved (of \nHard) by model and harness under the locked protocol. \todo{Preliminary team runs; confirm before submission.}}
+\caption{Hard tasks resolved (of 51) by model and harness under the locked protocol. \todo{Preliminary team runs; confirm before submission.}}
 \label{tab:harness}
 \end{table}

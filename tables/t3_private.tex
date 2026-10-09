@@ -5,13 +5,13 @@
 \toprule
 System & As shipped & Verifier fixed & Fully fixed \\
 \midrule
-Opus 5 (xhigh) & \privOpusShippedPct & \privOpusVPct & \textbf{\privFinalOpusPct} \\
-Kimi K3 (max) & \privKimiShippedPct & \privKimiVPct & \textbf{\privFinalKimiPct} \\
-GLM-5.3 (max) & \privGlmShippedPct & \privGlmVPct & \textbf{\privFinalGlmPct} \\
-Gemini 3.8 Flash & \privGeminiShippedPct & \privGeminiVPct & \textbf{\privFinalGeminiPct} \\
-Inkling (xhigh) & \privInklingShippedPct & \privInklingVPct & \textbf{\privFinalInklingPct} \\
+Opus 5 (xhigh) & 81.6 & 88.2 & \textbf{93.0} \\
+Kimi K3 (max) & 78.7 & 84.2 & \textbf{88.2} \\
+GLM-5.3 (max) & 77.6 & 83.1 & \textbf{87.9} \\
+Gemini 3.8 Flash & 77.6 & 83.5 & \textbf{86.0} \\
+Inkling (xhigh) & 67.6 & 71.3 & \textbf{79.0} \\
 \bottomrule
 \end{tabular}}
-\caption{The never-public set (\nPriv{} tasks), percent resolved. The middle column re-grades the same patches with the fixed verifier. The last column re-runs all systems after \nPrivEdited{} instructions were corrected and the images rebuilt.}
+\caption{The never-public set (272 tasks), percent resolved. The middle column re-grades the same patches with the fixed verifier. The last column re-runs all systems after 68 instructions were corrected and the images rebuilt.}
 \label{tab:private}
 \end{table}
