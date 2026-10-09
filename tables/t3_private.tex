@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{3pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+System & As shipped & Verifier fixed & Fully fixed \\
+\midrule
+Opus 5 (xhigh) & \privOpusShippedPct & \privOpusVPct & \textbf{\privFinalOpusPct} \\
+Kimi K3 (max) & \privKimiShippedPct & \privKimiVPct & \textbf{\privFinalKimiPct} \\
+GLM-5.3 (max) & \privGlmShippedPct & \privGlmVPct & \textbf{\privFinalGlmPct} \\
+Gemini 3.8 Flash & \privGeminiShippedPct & \privGeminiVPct & \textbf{\privFinalGeminiPct} \\
+Inkling (xhigh) & \privInklingShippedPct & \privInklingVPct & \textbf{\privFinalInklingPct} \\
+\bottomrule
+\end{tabular}}
+\caption{The never-public set (\nPriv{} tasks), percent resolved. The middle column re-grades the same patches with the fixed verifier. The last column re-runs all systems after \nPrivEdited{} instructions were corrected and the images rebuilt.}
+\label{tab:private}
+\end{table}

@@ -1,0 +1,28 @@
+\section{The Hard Split}
+\label{app:hard}
+The \nHard{} tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families (Opus~5, GLM-5.3, Kimi K3, Inkling, Gemini~3.8 Flash) failed it. That gave \nHardCandidates{} candidates after excluding \nHardDefectDrop{} tasks with verified defects, and \nHardAuditDrop{} more were removed after review. Every Hard task passes with its reference solution and fails with an empty patch. Readers should know four things about the released list.
+\begin{itemize}\setlength\itemsep{0pt}
+\item \hardKimiOnly{} tasks qualify only through partner runs of Kimi K3.
+\item \hardRewritten{} of the \nHard{} instructions were edited after selection, against \otherRewritten{} elsewhere.
+\item One task (openlibrary \task{7cbfb812}) has a verified test defect, and one (ansible \task{40ade1f8}) has a timing-sensitive test.
+\item Every Hard task is solved by at least one of our runs.
+\end{itemize}
+
+\section{Disagreements Between the Two Grades}
+\label{app:flips}
+Table~\ref{tab:flips} lists every task whose grade in the agent's sandbox differs from its first grade in a clean container, across our public runs. The runs labelled v2.2r used an earlier release of the tests.
+
+\input{tables/t7_flips}
+
+\section{The Never-Public Set}
+\label{app:private}
+The \nPriv{} tasks come from \nPrivOrgs{} organisations (\nPrivGo{} in Go, the rest in Python and JavaScript) whose code, to their knowledge, has never been on the open web. Table~\ref{tab:privdefects} lists the defects found while running it and their status. The instruction audit was done by an LLM judge (Claude Opus~5) that saw the instruction, the hidden tests and the reference solution but no model output. We checked eight of its judgments by hand. Its grades are noisy: it agreed with itself on \privJudgeAgree\% of re-judged unchanged tasks. On the final release, every system was run again with the same scaffold, effort and budget. With the imitation-SDK passes counted as failures, the scores are \privStrictOpusPct{} (Opus~5), \privStrictKimiPct{} (Kimi K3), \privStrictGlmPct{} (GLM-5.3), 86.0 (Gemini) and 79.0 (Inkling).
+
+\input{tables/a10_private_defects}
+
+\section{Reproducibility}
+\label{app:repro}
+\paragraph{Harness.} Upstream Harbor \harborVersion{} on Modal \modalVersion{}. The network is set per phase: public during setup, only the model endpoint during the agent phase, public again for the verifier, because \nNeedNet{} tasks download dependencies while testing.
+\paragraph{Scaffolds.} Claude Code \ccVersion{} on the public runs and 2.1.283 on the private runs, with web tools disabled. Codex \codexVersion{}, with hosted web search disabled. mini-swe-agent 2.4.6, with no step or cost limit, so the time budget binds.
+\paragraph{Budget and grading.} The budget is 3000\,s per task. The agent is stopped at 2940\,s, and the patch present then is graded. The patch is the staged \texttt{git diff} of the working tree. It is applied to a fresh container built from the task image, with a three-way fallback, and the unchanged verifier runs. When the sandbox grade and the clean grade disagree, two more clean grades are taken and the majority of the three clean grades counts.
+\paragraph{Release.} Task directories, the Hard split, the probe, capture and re-grade scripts, the exact harness flags, and per-task grades in both modes for every run.

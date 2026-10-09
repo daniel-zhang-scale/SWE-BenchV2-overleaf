@@ -1,0 +1,26 @@
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llrr}
+\toprule
+System & Scaffold & V2 (\nTasks) & Hard (\nHard) \\
+\midrule
+Claude Opus 5 (xhigh) & Claude Code & \opusXPct & \hardOpusXPct \\
+Claude Opus 5.5 (xhigh) & Claude Code & \opusFiveFivePct & \hardOpusFiveFivePct \\
+Claude Fable 5.1 (high) & Claude Code & \fablePct & \hardFablePct \\
+GPT-6 Astra (high) & Codex & \astraPct & \hardAstraPct \\
+Gemini 3.8 Flash (high) & mini-swe-agent & \geminiPct & \hardGeminiPct \\
+\midrule
+\multicolumn{4}{l}{\emph{Partner runs (same protocol, single grade, not re-graded by us)}} \\
+Kimi K3 & mini-swe-agent & \kimiLbPct & \hardKimiPct \\
+GLM-5.3 & mini-swe-agent & \glmLbPct & \hardGlmLbPct \\
+Inkling & mini-swe-agent & \inklingLbPct & \hardInklingLbPct \\
+Claude Sonnet 5 & Claude Code & -- & \hardSonnetPct \\
+GPT-5.6 Terra (xhigh) & Codex & -- & \hardTerraPct \\
+GPT-5.6 Sol (xhigh) & Codex & -- & \hardSolPct \\
+Claude Haiku 4.5 & Claude Code & -- & \hardHaikuPct \\
+\bottomrule
+\end{tabular}}
+\caption{Percent of tasks resolved under the locked protocol, one attempt per task. Our runs report the grade in a clean container, with disagreements settled by fresh grades.}
+\label{tab:main}
+\end{table}

@@ -1,0 +1,28 @@
+\begin{table*}[t]
+\centering\small
+\begin{tabular}{p{0.17\textwidth}p{0.20\textwidth}ccp{0.39\textwidth}}
+\toprule
+Run & Task & In place & Fresh & Cause and adjudication \\
+\midrule
+Opus 5 (high, v2.2r) & vuls \texttt{ef2be3d6} & \cmark & \xmark & Forged \texttt{goval-dictionary v0.9.5}: module zip served from a file-based \texttt{GOPROXY}, fabricated \texttt{go.sum} entry; the clean image fails the checksum \\
+Opus 5 (high, v2.2r) & vuls \texttt{ca3f6b1d} & \cmark & \xmark & Vendored, modified dependency whose \texttt{log/} package is git-ignored; the captured patch is incomplete \\
+Opus 5 (high, v2.2r) & ansible \texttt{40ade1f8}, teleport \texttt{ba6c4a13} & \xmark & \cmark & One timing-sensitive test failed under agent-phase load (two tasks) \\
+Opus 5 (high, v2.2r) & webclients \texttt{c6f65d20} & \cmark & \xmark & Missed a 5\,s Jest timeout on a cold image; fresh grades 0,1,1, adjudicated pass \\
+Inkling (high, v2.2r) & vuls \texttt{ef2be3d6} & \cmark & \xmark & Forged \texttt{goval-dictionary v0.9.5} from the older cached module with a fabricated \texttt{.info} and \texttt{go.sum} entry, as Opus~5 did; 2/2 fresh fails \\
+Inkling (high, v2.2r) & vuls \texttt{ca3f6b1d} & \cmark & \xmark & Edited a struct field into a cached dependency with \texttt{sed -i}; nothing in the diff; 2/2 fresh fails \\
+Inkling (high, v2.2r) & navidrome \texttt{874b17b8} & \cmark & \xmark & Made the module cache writable and added a file to a cached dependency; 2/2 fresh fails \\
+Gemini 3.8 Flash & flipt \texttt{3d5a345f} & \cmark & \xmark & Fabricated \texttt{go.sum} entries for real dependencies after rehearsing the forgery on a fake module in the local proxy cache; 2/2 fresh fails \\
+Gemini 3.8 Flash & flipt \texttt{c188284f} & \cmark & \xmark & Fabricated \texttt{go.work.sum} checksum; 2/2 fresh fails \\
+Gemini 3.8 Flash & navidrome \texttt{874b17b8} & \cmark & \xmark & Edited the module cache in place; 2/2 fresh fails (Opus~5 and GLM-5.3 solved the same task offline by vendoring a local fork under a \texttt{replace} directive) \\
+Gemini 3.8 Flash & NodeBB \texttt{be43cd25}, tutanota \texttt{f3ffe17a} & \xmark & \cmark & Flaky tests; 2/2 fresh passes \\
+Opus 5 (xhigh) & ansible \texttt{40ade1f8} & \cmark & \xmark & The timing-flaky revised test; fresh grades 0,1,1, adjudicated pass \\
+Opus 5 (xhigh) & element-web \texttt{71fe08ea} & \xmark & \cmark & Fresh grades 1,1,1; in-place fail was a sandbox flake \\
+Opus 5.5 (xhigh) & element-web \texttt{72a8f8f0} & \cmark & \xmark & Flaky composer test; fresh grades 0,1,1, adjudicated pass \\
+Fable 5.1 & NodeBB \texttt{bd80d36e} & \cmark & \xmark & Fresh grades 0,1,1, adjudicated pass \\
+Fable 5.1 & teleport \texttt{645afa05} & \xmark & \cmark & Fresh grades 1,1,1 \\
+GPT-6 Astra & element-web \texttt{53b42e32} & \cmark & \xmark & Flaky test unrelated to the edit; fresh grades 0,1,0, adjudicated fail \\
+\bottomrule
+\end{tabular}
+\caption{Every task whose in-place and first fresh-sandbox grades differ, across the runs of Table~\ref{tab:main}. Pass-to-fail flips are either environment dependence (forged or edited dependencies, all rejected by the pristine image) or flaky tests; fail-to-pass flips are sandbox-side flakes. GLM-5.3 had no disagreement between its two grades. Private-set flips are in the release; they are the caught forgeries of \S\ref{sec:private} and flaky tests.}
+\label{tab:flips}
+\end{table*}

@@ -1,0 +1,22 @@
+\section{Experiments}
+
+\subsection{Setup}
+We ran several systems on SWE Bench Pro V2. Claude Code ran Claude Opus~5 and Opus~5.5 at xhigh effort and Fable~5.1 at high effort. Codex ran GPT-6 Astra at high effort, and mini-swe-agent ran Gemini~3.8 Flash at high effort. \dyz{you already have a table below about the settings no need to enumerate everything. Just say for private ones use native harness, for public ones and gemini use miniswe} Each task gets one attempt and a 50-minute budget, and the patch present at the deadline is graded. A system is a model plus its scaffold and effort setting, so we compare systems, not models. Versions and commands are in Appendix~\ref{app:repro}.
+
+\input{tables/t2_main}
+
+\subsection{Main results} \dyz{let's expand every single paragraph below}
+After the fixes, frontier systems solve almost every task (Table~\ref{tab:main}). Our five runs resolve \geminiPct--\opusXPct\%, and every one of the \nTasks{} tasks is solved by at least one of them. The full set no longer separates the strongest systems. The three Claude systems are statistically tied ($p\geq0.72$), and on the \nPubUnedited{} tasks whose instructions were largely unchanged, Opus~5 still resolves \opusXUneditedPct\%. The high scores therefore do not only come from instructions we rewrote after seeing failures.
+
+\subsection{The Hard split}
+The Hard split contains \nHard{} tasks on which our runs range from \hardGeminiPct\% to \hardOpusXPct\% (Figure~\ref{fig:spread}). Each of the four strongest systems beats Gemini on Hard ($p<0.001$). Astra and Gemini are a useful contrast: they are tied on the other 591 tasks (576 against 579, $p=0.68$), but on Hard Astra resolves 46 tasks to Gemini's 30.  Claude Sonnet~5, GPT-5.6 Terra and Sol, Kimi K3 and GLM-5.3 resolve 42--45 Hard tasks, while Inkling resolves 16 and Claude Haiku~4.5 13. Hard does not separate the top four from each other (46--50 tasks), so ranking at the very top still needs harder tasks.
+
+\subsection{What the evaluation fixes caught} \dyz{do these belong here or in Discussions or maybe 3.3?}
+\paragraph{No retrieval.} Agents did try the network: depending on the system, between \netOpusFiveFive{} and \netAstra{} fetch commands per run, mostly package installs. We checked every flagged command by hand: all were refused, and no run retrieved any external content. Gemini once tried to disguise a request to the Go module proxy as traffic to the model endpoint which was also refused.
+
+\paragraph{Faked dependencies.} When an agent could not download a dependency, it sometimes built a fake one. Gemini forged Go module versions, wrote made-up checksums, or edited the shared module cache. All of these passed in the agent's sandbox and failed in the clean container, because the fake lived outside the patch. Without the second grade, each would have counted as a pass. 
+
+% \subsection{Do the data fixes matter?}
+% \label{sec:private}
+% \input{tables/t3_private}
+% We applied the same fixes to a private set of \nPriv{} tasks from the private repositories of \nPrivOrgs{} organisations (Table~\ref{tab:private}). Expert engineers corrected \nPrivEdited{} instructions that an automated audit had flagged as unclear about what the tests check. The audit saw no model output, so these edits were not chosen from failures. Opus~5 rose from \privOpusShippedPct\% to \privOpusVPct\% to \privFinalOpusPct\%. On the \nPrivEdited{} corrected tasks, the pass rate pooled over five systems rose from \privEditedBeforePct\% to \privEditedAfterPct\%, while the other \nPrivUnedited{} tasks moved by under one point. Fixing the data changes the scores, and it changes them where the fixes were made. This set also separates systems: Opus~5 beats every other system (Holm-corrected $p\leq0.043$). Re-grading missed one trick here. On two tasks needing an SDK missing from the images, three systems wrote their own imitation SDK into the patch, and it passed because the tests mock the client. Counting those \nFakeSDK{} passes as failures lowers no score by more than 0.8 points.

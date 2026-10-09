@@ -1,0 +1,116 @@
+% Preamble: \usepackage{booktabs,tabularx,graphicx,tikz}
+%           \usetikzlibrary{positioning,arrows.meta,calc}
+\section{Methodology}
+\label{sec:method}
+
+We start from the 731 tasks of the original SWE-Bench Pro Public. A task consists of an instruction (problem statement, requirements, new interfaces), a container image with the repository at its base commit, a reference patch, a hidden test patch, fail-to-pass and pass-to-pass lists naming the graded tests, and a verifier that applies the test patch, runs the tests and parses the output. A task is valid if every solution that satisfies the instruction passes and every solution that does not, fails. Our agentic audits flagged 200 tasks (27\%), and engineers adjudicated each flag (Figure~\ref{fig:pipeline}). The released set has 642 tasks: 531 never flagged, 66 repaired and 45 flagged but kept unchanged. The remaining 89 were discarded.
+
+\input{figures/pipeline}
+
+\subsection{Agentic audits}
+\label{sec:audits}
+
+\paragraph{Artifact audit.}
+An LLM agent compared each task's instruction with its test patch, graded-test lists and reference patch, without executing anything. It flagged six patterns: test requirements missing from the instruction, instruction statements contradicted by the tests, test or solution detail copied into the instruction, changed behaviour that no graded test exercises, fixtures read by the tests but never created, and graded lists naming a whole test file. Requirement sections far above the dataset median length (about 2{,}800 characters) were treated as a leakage signal, as they often transcribed the reference patch. A human auditor reviewed the agent's flags, and marked high-priority cases. The final audit flagged 161 tasks. 
+
+\paragraph{Failure audit.}
+We ran four agent configurations on every task: Claude Code with Claude Opus~5, Codex with GPT-5.6, and mini-SWE-agent with each model. For each failed run, an LLM judge read the trajectory, patch, verifier log and graded tests and attributed the failure to the model or to the task. A task was flagged when a patch consistent with a reasonable reading of the instruction was rejected. In one \textit{vuls} task, two configurations fell back to the bundle directory name as instructed and reported \texttt{Sample.app}, while the graded test expects \texttt{Sample} because the reference patch strips the suffix without the instruction saying so. For each flag the judge recorded the defect type, the fix location (instruction, tests, image, graded list or verifier), an effort estimate, a proposed edit, and the passing and failing configurations.
+% CHECK: confirm with the audit team that failure attribution was done by an LLM judge.
+
+\subsection{Defect taxonomy}
+\label{sec:taxonomy}
+
+We merged the audits' labels into the six categories of Table~\ref{tab:repairs-discards} and assigned each task the defect that determined its outcome. Unstated requirements, contradictions and verifier or environment defects make correct solutions fail. Leakage and insufficient tests make a task easier than intended or let an incomplete solution pass. Table~\ref{tab:problems} maps the categories to data and evaluation problems.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\columnwidth}{@{}>{\raggedright\arraybackslash}p{2.05cm} >{\raggedright\arraybackslash}X r r@{}}
+\toprule
+\textbf{Category} & \textbf{Description} & \textbf{Rep.} & \textbf{Disc.} \\
+\midrule
+Solution leakage & The instruction gives away test or solution detail. & 24 & 4 \\
+\addlinespace
+Spec--test contradiction & The instruction contradicts what the tests check. & 8 & 5 \\
+\addlinespace
+Unstated test requirement & The tests require behaviour, names or files the instruction never states. & 31 & 22 \\
+\addlinespace
+Insufficient tests & The tests miss part of the change or check incidental details instead of behaviour. & 3 & 33 \\
+\addlinespace
+Verifier or environment defect & The grading setup or container decides the score regardless of the solution. & 0 & 19 \\
+\addlinespace
+Miscellaneous & -- & -- & 6 \\
+\midrule
+\textbf{Total} & & \textbf{66} & \textbf{89} \\
+\bottomrule
+\end{tabularx}
+\caption{Defect categories of tasks repaired and kept (Rep.) and discarded (Disc.) between the 731 tasks of SWE-Bench Pro Public v1.1 and the final 642. Repairs edited the instruction in 63 tasks and the test patch in 4 (one task both).}
+\label{tab:repairs-discards}
+\end{table}
+
+\input{tables/t1_problems}
+
+\paragraph{Unstated test requirement (31 repaired, 22 discarded).}
+The tests depend on behaviour, names or files the instruction does not mention. In a \textbf{flipt} task, \texttt{TestLoad} reads three YAML samples (\texttt{otlp.yml} with \texttt{samplingRatio} set to 0.5, \texttt{wrong\_sampling\_ratio.yml} and \texttt{wrong\_propagator.yml}) that existed only in the reference patch. The repaired instruction specifies all three. The \textit{vuls} bundle-name task was repaired by stating that the \texttt{.app} suffix is removed. We repaired a task when the missing requirement is behaviour the task is about, and discarded it when the test checks how the reference patch happens to be written, since stating that would give the solution away. Discarded tests read a private attribute (\texttt{\_values} in \textit{qutebrowser}), pin avatar CSS classes in a snapshot (element-web), or inspect a private client through \texttt{reflect} and \texttt{unsafe} (flipt). 
+
+\paragraph{Spec--test contradiction (8 repaired, 5 discarded).}
+A vuls instruction said a package is \textit{not affected} when exactly one of the package and the OVAL definition carries a modularity label. Four pre-existing graded cases require the legacy fallback to the host's enabled modules, which the reference patch keeps, and the repair states that fallback. Contradictions whose fix lies in the tests were discarded, for example a \textit{webclients} task whose interface declares an \texttt{Element} argument while the graded test passes a \texttt{Document}.
+
+\paragraph{Solution leakage (24 repaired, 4 discarded).}
+Leaky instructions walked through the reference patch file by file, quoted its strings, or copied expected values from the tests. A \textit{tutanota} instruction told the agent to update the try-catch block around \texttt{aes256Decrypt} in \texttt{decrypt}. The repaired version specifies behaviour only: a \texttt{CryptoError} raised by the crypto library must surface as the application's own \texttt{CryptoError}, which the credentials layer converts to \texttt{KeyPermanentlyInvalidatedError}. Repairs delete the leaked text and, where a test depends on it, restate the requirement as behaviour. The four discards were repaired and then removed with a late batch (\S\ref{sec:review}).
+
+\paragraph{Insufficient tests (3 repaired, 33 discarded).}
+The graded tests leave part of the change unchecked (28) or assert incidental details (5). In a \textit{flipt} task they cover only the error paths of a new cache layer, so a \texttt{getJSON} that always returns false and a no-op \texttt{setJSON} pass. Engineers did not write tests, so these tasks were discarded. The three repairs are auditor edits that each add one assertion. A \textit{vuls} test now expects an error for an image reference with both a tag and a digest, and a teleport fuzz test now requires the parser error it previously ignored. 
+
+\paragraph{Verifier or environment defect (19 discarded).}
+In 16 tasks the fail-to-pass list names a whole file (e.g.\ \texttt{test/tests/calendar/\allowbreak CalendarUtilsTest.js \textbar{} test suite}), so any unrelated or flaky failure in that file fails a correct patch. In 3 tasks the image prevents grading. A vuls test imports a package that exists only in a newer module version than the image's offline Go module cache holds, and a teleport test is skipped because SoftHSM is missing, which the verifier scores as a failure. These tasks needed per-task changes to the graded list or the image, shared verifier defects were fixed globally (\S\ref{sec:verifier}).
+
+
+\subsection{Engineer review}
+\label{sec:review}
+
+Engineers focused on the criteria that if the reference patch adds a behaviour and a hidden test checks it, the instruction must state the behavior, but not how the reference patch implements it. Hidden tests were never edited to agree with an instruction, and instructions were never rewritten to match a wrong test.
+
+\nEngineers{} contracted engineers adjudicated every flag, spending \expertHours{} hours in total. For each claim in a flag they recorded whether it holds, holds in part or does not hold, citing evidence by artifact and line (eg: \texttt{requirements:19}, \texttt{test\_patch\_before:178}, \texttt{f2p:1}, \texttt{golden:562}). A false flag leaves the task unchanged, a flag whose gap is in the instruction leads to an edit limited to where the flag holds, a flag whose remedy lies in the tests, fixtures, verifier or image leads to quarantine, i.e.\ removal. High-priority flags received a second independent review and a third pass by the project team. %The audit team checked all 147 verdicts on its proposed removals and challenged four, which were re-examined.
+% CHECK: confirm \nEngineers and \expertHours cover the review of all 200 flags, not only the 55 instruction repairs.
+
+For those 147 tasks, reviewers confirmed 70 flags, partly confirmed 21 and rejected 56. The final outcome was 34 repaired, 43 kept and 70 discarded. Of the 54 failure-audit flags, 35 were repaired and 19 discarded. The judge's fix location predicted the outcome well: 28 of the 31 flags it located in the instruction were repaired, and 16 of the 23 located elsewhere were discarded. For the other 7, engineers found a fix, mostly in the instruction (the flipt YAML task is one).
+
+Engineer repairs were validated blind. A second engineer who had seen neither the original task nor the reference patch implemented the edited instruction, and the edit shipped only if that implementation passed the hidden tests. For the auditors' repairs, the reference patch was re-run against the edited tests. Fourteen tasks repaired in a second batch were removed before release, we count them as discards under their original flag, and they include all four leakage discards. Two auditor repairs were not carried into the release, and those tasks are counted as kept. A task counts as repaired only if its instruction or test patch changed in response to a confirmed flag. Release-wide changes are not counted.
+% CHECK: add the reason the 14-task batch was removed at release.
+% CHECK: the final release also edited instructions of some unflagged tasks and 13 rejected-flag tasks (leak pass); decide whether to disclose these here.
+
+\subsection{Verifier hardening}
+\label{sec:verifier}
+
+Defects in shared grading code were fixed for all tasks.
+
+\paragraph{Scoping and resources.}
+The Go verifier ran \texttt{go test ./...} over the whole repository. Scoping it to the graded packages on 253 tasks removed out-of-memory failures and timeouts above 150 minutes without changing any grade. Run scripts on 231 tasks that executed the full suite were restricted to the graded tests. With automatic worker counts, pytest-xdist spawned up to 128 workers on small test files and crashed with ``no tests ran'': we capped it at four workers on 239 tasks and inside \texttt{ansible-test} on 83.
+
+\paragraph{Parsing and environment.}
+The jest parser assigned tests in failing files to the wrong file and dropped failures (47 tasks), and it truncated test titles at the first parenthesis: it now strips only the trailing timing. We added kernel headers for cgo builds (5 tasks), fetched at grading time one Go module missing from an image's offline cache, re-derived test scoping on 3 tasks that omitted the packages defining the graded tests, and restored CRLF line endings in a fixture that made the reference patch fail.
+
+\paragraph{Test-file reset.}
+Before the hidden tests run, the verifier (i)~restores every path the test patch touches and deletes only paths it creates; (ii)~restores modified tracked test data (test data, fixtures, mocks, snapshots), with allowlists for the six reference patches that change fixtures; (iii)~removes agent-written test files that collide with hidden tests; (iv)~clears stale git lock files left by killed agent commands; and (v)~deletes \texttt{\_\_pycache\_\_} and \texttt{.pyc} files. Without (i), agent edits to snapshots owned by the test patch made it fail to apply in 44 runs. Step (v) addresses \texttt{.pyc} files that an agent's \texttt{git stash} round trip left with unchanged size and timestamp, which made the verifier import the base code.
+
+On the assembled 642-task set, the reference patch passes every task and the empty patch fails every task.
+% CHECK: re-run the oracle/empty-patch check on the final release package; the 100%/0% result predates the last verifier and instruction updates.
+
+\subsection{Hardened evaluation protocol}
+\label{sec:protocol}
+
+We run every model under a locked protocol. The harness sets network access per phase of a run, probes the lock from inside the sandbox before the run starts, and grades the agent's patch in a fresh container rather than in the agent's sandbox. Table~\ref{tab:problems} maps each component to the problem it addresses.
+
+\paragraph{Network.}
+With the network open, \netTrajOpen{} of \nTasks{} Claude Opus~5 trajectories contacted code hosts, and \netOwnRepoOpen{} downloaded the task's own repository. Under the lock, the sandbox can reach only the model endpoint during the agent phase; the allowlist names that hostname alone, and the endpoint does not relay other traffic. Web tools that scaffolds execute outside the sandbox are disabled. Before each run, a probe executes in the sandbox under the job's exact flags and aborts the run unless every code host is unreachable, the endpoint answers and the reference patch still passes. The git history of all \probeImages{} images contains neither the fixing commit nor any reflog entries, stashes or dangling objects.
+
+\paragraph{Grading.}
+The original harness ran the verifier in the sandbox the agent had just used. Because the verifier restores test files but not binaries, a scripted agent that edits no source file and replaces \texttt{python3} with a script printing \textsc{PASSED} scores 1. We saw no model attempt this, but forged dependencies passed through the same gap: with the network closed, some agents that could not fetch a fix edited the Go module cache in place or served a fabricated module version from a local \texttt{GOPROXY}, and neither change appears in the diff. We now save the agent's changes as a patch, apply it to a fresh copy of the task image, run the unchanged verifier there and report that grade. Binaries, module caches, \texttt{node\_modules}, \texttt{site-packages} and \texttt{go env} settings do not carry over.
+%We report both grades for every task. When the two disagree, two more fresh grades decide, by majority.
+% CHECK: CHEATING_MODES.md says the fresh re-grade is authoritative and that flips are adjudicated with 2 extra fresh re-grades (a forgery fails 2/2, a flake passes at least 1/2). Align the commented sentence with that before re-enabling it.
+
+\paragraph{Audits.}
+A fresh re-grade cannot catch a forgery committed inside the patch, so we audit patches for \texttt{replace} directives that point into the patch or to absolute paths, \texttt{go.sum} entries for modules absent from the image, and large new directories that imitate a third-party SDK. We also scan trajectories for fetches that returned content; writes to module caches, package directories or \texttt{/usr/*bin}; and reads of \texttt{/tests} or \texttt{/solution}.
+% CHECK: state whether flagged patches are rejected automatically or reviewed by hand.

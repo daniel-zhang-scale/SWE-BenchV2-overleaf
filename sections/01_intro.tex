@@ -1,0 +1,19 @@
+\section{Introduction}
+
+Benchmarks built from real GitHub issues, such as SWE-bench \citep{jimenez2024swebench}, have become the standard way to compare coding agents. SWE-Bench Pro \citep{deng2025swebenchpro} was built to be harder: its tasks come from \nRepos{} repositories, need long changes, and each comes with a written specification and hidden tests. \dyz{please expand}
+
+Two problems have since been found. \dyz{Similar comments as the abstract, here's the paragraph where you should really expand on defining the error buckets we found for this benchmark and how we identified those. You can quote the community findings but that should just be a simple reference.} The first is in the data. OpenAI estimated that about 30\% of the public tasks are broken \citep{openai2026signal}. Some tests check details the instruction never mentions. Some instructions contradict the tests. In both cases a correct solution fails. The second is in the evaluation. Agents could cheat in various ways most easily searching the internet or the repository's git history to find the original fix. \citet{swebenchproverified2026} showed this inflates scores: blocking those routes turned \verPassFail{} passes of one model into failures.
+
+We fix both problems and release the result as SWE-Bench Pro V2. To fix the data, \dyz{same comments as abstract, this reads really trivial. Can you describe the actual pipeline we built to fix the data? should be multi-stages and a combination of agentic checks and manual fixes + QC layer } expert engineers corrected instructions so that they state exactly what the tests check, and a second engineer confirmed each fix by solving the task from the corrected text alone.  To fix the evaluation, the agent may reach only the model endpoint, and its patch is graded again in a fresh container it never touched.
+
+After the fixes, the strongest systems solve almost every task (Figure~\ref{fig:spread}). The full set no longer tells them apart, so we also release a Hard split of \nHard{} tasks, which does. \dyz{ok let's rewrite and expand each paragraph, this reads like notes. Here acknowledge frontier models saturated on full set but gap still remain with laggers. Then talk about Hard split to increase the spread. Then note that this is clean set that serves as great test bed for both frontier and OSS small models.} Our contributions are as follows: \dyz{can add harness analysis later. Why "Results" is a contribution? Let's revise these}
+
+\begin{itemize}\setlength\itemsep{0pt}
+\item We release SWE-Bench Pro V2: \nTasks{} tasks, each passing with its reference solution.
+\item \textbf{Fixing the data.} \nEngineers{} engineers spent \expertHours{} hours correcting instructions, each fix verified by a blind re-implementation.
+\item \textbf{Fixing the evaluation.} A locked protocol blocks all network access except the model endpoint and re-grades every patch in a clean container. No run retrieved external content, and re-grading caught every faked dependency.
+\item \textbf{Results.} Frontier systems resolve \geminiPct--\opusXPct\% of V2. On the Hard split however, runs range from 59\% to 98\%.
+\item We discuss the importance of SWE Bench Pro v2 despite saturation by frontier models.
+\end{itemize}
+
+\input{figures/fig_spread}

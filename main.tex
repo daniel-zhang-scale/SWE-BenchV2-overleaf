@@ -1,0 +1,40 @@
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[11pt]{article}
+\usepackage[preprint]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pifont}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\task}[1]{\texttt{#1}}
+\input{tables/numbers}
+\sloppy
+\newcommand{\dyz}[1]{\textcolor{red}{[Daniel: #1]}}
+
+\title{SWE-Bench Pro v2: A Cleaner, Harder-to-Game Coding Benchmark}
+\author{Soham Dan, Jeff Da, Sanyam Bhutani, Miguel Romero...TBD, ..., Ying Liu, Daniel Yue Zhang}
+
+\begin{document}
+\maketitle
+\input{sections/00_abstract}
+\input{sections/01_intro}
+\input{sections/02_related}
+\input{sections/03_method}
+\input{sections/04_experiments}
+\input{sections/05_conclusion}
+%\input{sections/06_limitations}
+\bibliography{refs}
+%\appendix
+%\input{appendix/A_appendix}
+\end{document}
