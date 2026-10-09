@@ -23,6 +23,6 @@ Fable 5.1 & teleport \texttt{645afa05} & \xmark & \cmark & Fresh grades 1,1,1 \\
 GPT-6 Astra & element-web \texttt{53b42e32} & \cmark & \xmark & Flaky test unrelated to the edit; fresh grades 0,1,0, adjudicated fail \\
 \bottomrule
 \end{tabular}
-\caption{Every task whose in-place and first fresh-sandbox grades differ, across the runs of Table~\ref{tab:main}. Pass-to-fail flips are either environment dependence (forged or edited dependencies, all rejected by the pristine image) or flaky tests; fail-to-pass flips are sandbox-side flakes. GLM-5.3 had no disagreement between its two grades. Private-set flips are in the release; they are the caught forgeries of \S\ref{sec:private} and flaky tests.}
+\caption{Every task whose in-place and first fresh-sandbox grades differ, across the runs of Table~\ref{tab:main}. Pass-to-fail flips are either environment dependence (forged or edited dependencies, all rejected by the clean image) or flaky tests; fail-to-pass flips are sandbox-side flakes. GLM-5.3 had no disagreement between its two grades. Private-set flips are in the release; they are the caught forgeries of \S\ref{sec:private} and flaky tests.}
 \label{tab:flips}
 \end{table*}

@@ -13,15 +13,15 @@ Unstated test requirement & flipt & \texttt{TestLoad} reads three YAML samples (
 \addlinespace
  & vuls & The instruction says to fall back to the bundle directory name. Two agent configurations did so and reported \texttt{Sample.app}, but the graded test expects \texttt{Sample} because the reference patch strips the suffix. & Repaired: the instruction states that the \texttt{.app} suffix is removed. \\
 \addlinespace
- & qutebrowser & A graded test reads the private attribute \texttt{\_values}. & Discarded: stating it would dictate the implementation. \\
+ & qutebrowser & A graded test reads the private attribute \texttt{\_values}. & Discarded, since stating it would dictate the implementation. \\
 \addlinespace
 Spec--test contradiction & vuls & The instruction says a package is \emph{not affected} when exactly one of the package and the OVAL definition carries a modularity label, but four pre-existing graded cases require the legacy fallback to the host's enabled modules. & Repaired: the instruction states the fallback, which the reference patch keeps. \\
 \addlinespace
- & webclients & The interface declares an \texttt{Element} argument, while the graded test passes a \texttt{Document}. & Discarded: the fix lies in the tests. \\
+ & webclients & The interface declares an \texttt{Element} argument, while the graded test passes a \texttt{Document}. & Discarded, since the fix lies in the tests. \\
 \addlinespace
-Solution leakage & tutanota & The instruction tells the agent to update the try-catch block around \texttt{aes256Decrypt} in \texttt{decrypt}. & Repaired: behaviour only. A \texttt{CryptoError} raised by the crypto library must surface as the application's own \texttt{CryptoError}, which the credentials layer converts to \texttt{KeyPermanentlyInvalidatedError}. \\
+Solution leakage & tutanota & The instruction tells the agent to update the try-catch block around \texttt{aes256Decrypt} in \texttt{decrypt}. & Repaired to describe behaviour only. A \texttt{CryptoError} raised by the crypto library must surface as the application's own \texttt{CryptoError}, which the credentials layer converts to \texttt{KeyPermanentlyInvalidatedError}. \\
 \addlinespace
-Insufficient tests & flipt & The graded tests cover only the error paths of a new cache layer, so a \texttt{getJSON} that always returns false and a no-op \texttt{setJSON} pass. & Discarded: engineers did not write new tests. \\
+Insufficient tests & flipt & The graded tests cover only the error paths of a new cache layer, so a \texttt{getJSON} that always returns false and a no-op \texttt{setJSON} pass. & Discarded, since engineers did not write new tests. \\
 \addlinespace
  & vuls & No graded test checks an image reference that carries both a tag and a digest. & Repaired: one assertion added that expects an error for such a reference. \\
 \addlinespace
@@ -36,7 +36,7 @@ Environment defect & teleport & SoftHSM is missing from the image, so a graded t
 
 \section{Catalogue of Evaluation Exploits}
 \label{app:exploits}
-Table~\ref{tab:exploits} lists every route to an unearned pass that we observed in agent runs, found in community reports, or constructed ourselves, together with the countermeasure in the locked protocol (\S\ref{sec:protocol}). Table~\ref{tab:flips} gives the individual forgeries.
+Table~\ref{tab:exploits} lists every route to an unearned pass that we observed in agent runs, found in community reports or constructed ourselves, together with the corresponding countermeasure in the locked protocol (\S\ref{sec:protocol}). Table~\ref{tab:flips} gives the individual forgeries.
 \todo{Add two or three short trajectory excerpts (a network attempt under the lock, a forged \texttt{go.sum}, an imitation SDK) showing the commands the agents ran.}
 
 \begin{table*}[t]
@@ -51,7 +51,7 @@ Recovering the fix from git history & Future commits left in task images leaked 
 \addlinespace
 Tunnelling through the model endpoint & Gemini disguised a request to the Go module proxy as model-endpoint traffic. & The allowlist names the endpoint hostname alone, and the endpoint relays no other traffic; all tool calls are audited. \\
 \addlinespace
-Forging dependencies outside the patch & Opus~5 forged \texttt{goval-dictionary v0.9.5}, serving it from a file-based \texttt{GOPROXY} with a fabricated \texttt{go.sum} entry, and Inkling forged the same version from an older cached module; Gemini fabricated \texttt{go.sum} and \texttt{go.work.sum} entries. & Fresh-container re-grade: the pristine image fails the checksum. \\
+Forging dependencies outside the patch & Opus~5 forged \texttt{goval-dictionary v0.9.5}, serving it from a file-based \texttt{GOPROXY} with a fabricated \texttt{go.sum} entry, and Inkling forged the same version from an older cached module; Gemini fabricated \texttt{go.sum} and \texttt{go.work.sum} entries. & Fresh-container re-grade: the clean image fails the checksum. \\
 \addlinespace
 Editing shared caches in place & Inkling edited a cached dependency with \texttt{sed -i}, and elsewhere made the module cache writable and added a file to it; Gemini edited the module cache in place. & Fresh-container re-grade: caches do not carry over. \\
 \addlinespace
@@ -70,7 +70,7 @@ Reading hidden tests or the reference & On the never-public set, the verifier co
 
 \section{The Hard Split}
 \label{app:hard}
-The \nHard{} tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families (Opus~5, GLM-5.3, Kimi K3, Inkling, Gemini~3.8 Flash) failed it. That gave \nHardCandidates{} candidates after excluding \nHardDefectDrop{} tasks with verified defects, and \nHardAuditDrop{} more were removed after review. Every Hard task passes with its reference solution and fails with an empty patch. Readers should know four things about the released list.
+The \nHard{} tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families (Opus~5, GLM-5.3, Kimi K3, Inkling, Gemini~3.8 Flash) failed it. That gave \nHardCandidates{} candidates after excluding \nHardDefectDrop{} tasks with verified defects, and \nHardAuditDrop{} more were removed after review. Every Hard task passes with its reference solution and fails with an empty patch. We note four properties of the released list.
 \begin{itemize}\setlength\itemsep{0pt}
 \item \hardKimiOnly{} tasks qualify only through partner runs of Kimi K3.
 \item \hardRewritten{} of the \nHard{} instructions were edited after selection, against \otherRewritten{} elsewhere.
