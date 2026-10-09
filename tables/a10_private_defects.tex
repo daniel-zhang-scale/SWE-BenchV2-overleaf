@@ -4,17 +4,17 @@
 \toprule
 Defect & Description & Status in the final release \\
 \midrule
-D1 hidden-test restore & The shipped verifier applied the hidden test patch over the agent's working tree; any agent edit to a file the patch touches made the patch fail to apply and graded the task 0 (\privDoneTasksMin--\privDoneTasksMax{} tasks per system) & Fixed (restore before apply in all \nPriv{} verifiers); +10 to +18 tasks per system on replay \\
+D1 hidden-test restore & The shipped verifier applied the hidden test patch over the agent's working tree; any agent edit to a file the patch touches made the patch fail to apply and graded the task 0 (15--20 tasks per system) & Fixed (restore before apply in all 272 verifiers); +10 to +18 tasks per system on replay \\
 D5 test-symbol collision & An agent-added test file declaring a symbol the hidden test also declares fails the package compile & Fixed (colliding agent test files removed) \\
-D2 Go toolchain paths & Go images did not export \texttt{GOPATH}/\texttt{GOMODCACHE}, so agents had to rediscover the module cache (Opus~5 in \privGoFoundOpus{} of \nPrivGo{} Go trajectories, Inkling in \privGoFoundInkling) & Fixed in rebuilt images; offline compile of a sample of hidden-test packages went from 0/7 to 7/7 \\
+D2 Go toolchain paths & Go images did not export \texttt{GOPATH}/\texttt{GOMODCACHE}, so agents had to rediscover the module cache (Opus~5 in 131 of 154 Go trajectories, Inkling in 65) & Fixed in rebuilt images; offline compile of a sample of hidden-test packages went from 0/7 to 7/7 \\
 D3 end-of-life base images & Package repositories of older Debian images no longer resolve & Fixed in 13 of 14 images; one still cannot install packages \\
 D4 state-sensitive in-place grade & Fail-to-pass flips from agent-side toolchain state (\texttt{go env -w}) & Closed by fresh-sandbox grading \\
 Manifest egress & Three consecutive exports lacked the agent-phase no-network field, so egress was open under the harness flags & Fixed at source; probe still runs before every job \\
 Reference patch in verifier bundle & The verifier configuration carried the reference and test patches and commit identifiers & Removed; graded lists unchanged \\
-Missing SDK modules & Two tasks need AWS and Deepgram SDK modules absent from the images, so an honest solution cannot compile offline & Open; the \nFakeSDK{} imitation-SDK passes occurred here \\
+Missing SDK modules & Two tasks need AWS and Deepgram SDK modules absent from the images, so an honest solution cannot compile offline & Open; the 5 imitation-SDK passes occurred here \\
 Flaky test & A timing-dependent test fails a correct solution about one run in five in ten tasks & Open; adjudication restores most cases \\
 \bottomrule
 \end{tabular}
-\caption{Verifier and image defects found in the private set. The verifier repair is ours, validated with the two-sided gate and a full replay of every captured patch. The final release also carries the maintainers' image rebuild and the \nPrivEdited{} instruction corrections.}
+\caption{Verifier and image defects found in the private set. The verifier repair is ours, validated with the two-sided gate and a full replay of every captured patch. The final release also carries the maintainers' image rebuild and the 68 instruction corrections.}
 \label{tab:privdefects}
 \end{table*}

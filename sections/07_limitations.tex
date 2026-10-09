@@ -1,10 +1,10 @@
 \section*{Limitations}
 \label{sec:limitations}
-\paragraph{Residual defects.} Our audits are not exhaustive. The failure audit sees only tasks that some agent failed, so defects that let incomplete patches pass are found only by the artifact audit. The LLM judges are also noisy. On the never-public set, the instruction judge agreed with itself on \privJudgeAgree\% of re-judged unchanged tasks. Engineers kept \nKept{} flagged tasks after rejecting their flags, and known residual issues remain, including one Hard task with a verified test defect and one with a timing-sensitive test (Appendix~\ref{app:hard}).
+\paragraph{Residual defects.} Our audits are not exhaustive. The failure audit sees only tasks that some agent failed, so defects that let incomplete patches pass are found only by the artifact audit. The LLM judges are also noisy. On the never-public set, the instruction judge agreed with itself on 71\% of re-judged unchanged tasks. Engineers kept 45 flagged tasks after rejecting their flags, and known residual issues remain, including one Hard task with a verified test defect and one with a timing-sensitive test (Appendix~\ref{app:hard}).
 
 \paragraph{Edits informed by failures.} Some repairs came from the failure audit, which read agent trajectories, so they could favour the behaviour of the audited systems. The control on unedited tasks (\S\ref{sec:main-results}) and the model-blind study on the never-public set (\S\ref{sec:private}) reduce this concern but do not remove it.
 
-\paragraph{The Hard split was chosen using model failures.} Its tasks were selected because five model families failed them, so those families' Hard scores are biased downward. Systems outside the selection show the same spread, from \hardHaikuPct\% to \hardOpusFiveFivePct\%. With \nHard{} tasks, single-task differences are noise.
+\paragraph{The Hard split was chosen using model failures.} Its tasks were selected because five model families failed them, so those families' Hard scores are biased downward. Systems outside the selection show the same spread, from 25.5\% to 96.1\%. With 51 tasks, single-task differences are noise.
 
 \paragraph{One attempt per task.} Each system ran once, and every run had at least one flaky test. The partner runs carry a single grade and were not re-graded by us.
 
@@ -12,7 +12,7 @@
 
 \paragraph{What re-grading cannot catch.} Re-grading in a clean container rejects changes made outside the patch but cannot detect forgeries inside it, and the imitation SDKs on the never-public set passed both grades. Our audits match commands and files, so their counts are lower bounds. Instructions still name many of the symbols the tests use, a property of the original benchmark design that we measured but did not remove.
 
-\paragraph{Cost.} The repair took \expertHours{} engineer hours. The agentic audits concentrate this effort on the tasks most likely to be defective but do not eliminate it, and smaller benchmark efforts may not be able to afford it.
+\paragraph{Cost.} The repair took 1{,}897 engineer hours. The agentic audits concentrate this effort on the tasks most likely to be defective but do not eliminate it, and smaller benchmark efforts may not be able to afford it.
 
 \section*{Ethics Statement}
 The public tasks come from open-source repositories under their original licences. The never-public tasks come from organisations that consented to their use for evaluation, and their code is not released. The engineers who reviewed and repaired tasks were contracted for this work and paid \todo{compensation statement, e.g.\ hourly rate relative to local minimum wage}; no personal data about them is recorded or released. The paper describes how agents forged dependencies and how a sandbox grader can be fooled, because benchmark operators need this information to defend against these exploits. The fresh-container re-grade blocks both.

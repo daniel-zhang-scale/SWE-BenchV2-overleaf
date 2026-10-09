@@ -3,22 +3,22 @@
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{llrcr}
 \toprule
-System & Scaffold & V2 (\nTasks) & 95\% CI & Hard (\nHard) \\
+System & Scaffold & V2 (642) & 95\% CI & Hard (51) \\
 \midrule
-Claude Opus 5 (xhigh) & Claude Code & \opusXPct & [\ciOpusXLo, \ciOpusXHi] & \hardOpusXPct \\
-Claude Opus 5.5 (xhigh) & Claude Code & \opusFiveFivePct & [\ciOpusFiveFiveLo, \ciOpusFiveFiveHi] & \hardOpusFiveFivePct \\
-Claude Fable 5.1 (high) & Claude Code & \fablePct & [\ciFableLo, \ciFableHi] & \hardFablePct \\
-GPT-6 Astra (high) & Codex & \astraPct & [\ciAstraLo, \ciAstraHi] & \hardAstraPct \\
-Gemini 3.8 Flash (high) & mini-swe-agent & \geminiPct & [\ciGeminiLo, \ciGeminiHi] & \hardGeminiPct \\
+Claude Opus 5 (xhigh) & Claude Code & 99.4 & [98.4, 99.8] & 98.0 \\
+Claude Opus 5.5 (xhigh) & Claude Code & 99.4 & [98.4, 99.8] & 96.1 \\
+Claude Fable 5.1 (high) & Claude Code & 99.1 & [98.0, 99.6] & 92.2 \\
+GPT-6 Astra (high) & Codex & 96.9 & [95.2, 98.0] & 90.2 \\
+Gemini 3.8 Flash (high) & mini-swe-agent & 94.9 & [92.9, 96.3] & 58.8 \\
 \midrule
 \multicolumn{5}{l}{\emph{Partner runs (same protocol, single grade, not re-graded by us)}} \\
-Kimi K3 & mini-swe-agent & \kimiLbPct & [\ciKimiLbLo, \ciKimiLbHi] & \hardKimiPct \\
-GLM-5.3 & mini-swe-agent & \glmLbPct & [\ciGlmLbLo, \ciGlmLbHi] & \hardGlmLbPct \\
-Inkling & mini-swe-agent & \inklingLbPct & [\ciInklingLbLo, \ciInklingLbHi] & \hardInklingLbPct \\
-Claude Sonnet 5 & Claude Code & -- & -- & \hardSonnetPct \\
-GPT-5.6 Terra (xhigh) & Codex & -- & -- & \hardTerraPct \\
-GPT-5.6 Sol (xhigh) & Codex & -- & -- & \hardSolPct \\
-Claude Haiku 4.5 & Claude Code & -- & -- & \hardHaikuPct \\
+Kimi K3 & mini-swe-agent & 97.7 & [96.2, 98.6] & 86.3 \\
+GLM-5.3 & mini-swe-agent & 95.6 & [93.8, 97.0] & 86.3 \\
+Inkling & mini-swe-agent & 89.9 & [87.3, 92.0] & 31.4 \\
+Claude Sonnet 5 & Claude Code & -- & -- & 88.2 \\
+GPT-5.6 Terra (xhigh) & Codex & -- & -- & 86.3 \\
+GPT-5.6 Sol (xhigh) & Codex & -- & -- & 82.4 \\
+Claude Haiku 4.5 & Claude Code & -- & -- & 25.5 \\
 \bottomrule
 \end{tabular}}
 \caption{Percent of tasks resolved under the locked protocol, one attempt per task, with 95\% Wilson intervals on V2. Our runs report the grade in a clean container, with disagreements settled by fresh grades.}
