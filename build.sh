@@ -13,5 +13,5 @@ echo "== overfull hbox: $($GREP -c 'Overfull .hbox' main.log || true)   overfull
 echo "== undefined refs/citations: $($GREP -c 'undefined' main.log || true)   multiply defined: $($GREP -c 'multiply defined' main.log || true)"
 echo "== bibtex warnings: $($GREP -c 'Warning--' main.blg 2>/dev/null || true)"
 echo "== anonymity check (must be empty):"; $GREP -rniE "scale ?ai|scaleapi" main.tex sections appendix tables refs.bib || true
-echo "== pending placeholders:"; $GREP -rnE 'PENDING|[\]todo[{]|[\]dyz[{]' tables/numbers.tex sections appendix figures | $GREP -v newcommand || true
+echo "== pending placeholders:"; $GREP -rnE 'PENDING|[\]todo[{]|[\]dyz[{]' sections appendix tables figures | $GREP -v newcommand || true
 $GREP -q 'usepackage\[review\]{acl}' main.tex && echo "== review mode: on"

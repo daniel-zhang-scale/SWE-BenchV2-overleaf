@@ -13,18 +13,18 @@ Tests too weak & 36 tasks & 3 assertions added; 33 tasks discarded \\
 \addlinespace[1.5pt]
 Grading or image broken & 19 tasks; shared defects in 253 Go, 322 Python and 47 jest verifiers & 19 tasks discarded; verifiers scoped, capped, re-parsed \\
 \addlinespace[1.5pt]
-Parser renamed graded tests & Reference patch failed on \nParserFail{} tasks & Graded names regenerated \\
+Parser renamed graded tests & Reference patch failed on 23 tasks & Graded names regenerated \\
 \addlinespace[1.5pt]
 Agent files reach grading & 44 runs zeroed; stale bytecode & Test files, test data and bytecode reset before grading \\
 \midrule
 \multicolumn{3}{@{}l}{\textit{Evaluation}} \\
-Open internet & \netTrajOpen{}/\nTasks{} runs reached code hosts; \netOwnRepoOpen{} fetched their own repository & Only the model endpoint reachable; probed before each run \\
+Open internet & 32/642 runs reached code hosts; 25 fetched their own repository & Only the model endpoint reachable; probed before each run \\
 \addlinespace[1.5pt]
-Web tools outside the sandbox & \webFetchTrajOpen{}/\nTasks{} runs used web fetch & Disabled \\
+Web tools outside the sandbox & 13/642 runs used web fetch & Disabled \\
 \addlinespace[1.5pt]
 Grading in the agent's sandbox & A \texttt{python3} wrapper scores an empty patch 1 & Re-graded in a clean container \\
 \addlinespace[1.5pt]
-Fix in git history & \probeImages{} images checked & Fixing commit absent; probed \\
+Fix in git history & 642 images checked & Fixing commit absent; probed \\
 \bottomrule
 \end{tabularx}
 \caption{Problems found in SWE-Bench Pro and the v2 fix. Data problems concern the tasks; evaluation problems concern how runs are executed and graded.}
