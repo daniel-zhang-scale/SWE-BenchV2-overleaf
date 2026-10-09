@@ -1,5 +1,6 @@
 \begin{figure}[t]
 \centering\footnotesize
+\resizebox{\columnwidth}{!}{%
 \begin{tikzpicture}
 \node[anchor=east,font=\scriptsize] at (-0.1,0.00) {Claude Opus 5 (xhigh)};
 \draw[gray!30] (0,0.00) -- (5.2,0.00);
@@ -50,7 +51,7 @@
 \node[font=\scriptsize] at (2.60,-3.86) {\% resolved};
 \fill[black] (0.6,0.5) circle (2.1pt) node[right,font=\scriptsize] {all \nTasks{} tasks};
 \draw[black,fill=white,line width=0.8pt] (2.9,0.5) circle (2.1pt) node[right,font=\scriptsize] {Hard (\nHard{} tasks)};
-\end{tikzpicture}
-\caption{After the fixes, \dyz{we don't have to remind the reader of "after fixes" everywhere. This is a revamped benchmark, just refer directly to SWEBench Pro V2} every system resolves 90--99\% of V2 (filled dots), but the Hard split (open dots) spreads them from 31\% to 98\%.}
+\end{tikzpicture}}
+\caption{Percent of tasks resolved on SWE-Bench Pro V2 (filled dots) and its Hard split (open dots) under the locked protocol. The full set separates these systems by less than 10 points (\inklingLbPct--\opusXPct\%); the Hard split spreads them from \hardInklingLbPct\% to \hardOpusXPct\%. $^\dagger$Partner runs under the same protocol (Table~\ref{tab:main}).}
 \label{fig:spread}
 \end{figure}

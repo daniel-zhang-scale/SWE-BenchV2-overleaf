@@ -1,3 +1,73 @@
+\section{Defect Examples Before and After Repair}
+\label{app:examples}
+Table~\ref{tab:examples} gives representative tasks from each defect category of Table~\ref{tab:repairs-discards} and how each was resolved. A task was repaired when the missing or wrong information concerns behaviour the task is about, and discarded when stating it would dictate the implementation or when the defect lies in the tests, verifier or image.
+\todo{Replace the paraphrases with verbatim before/after instruction excerpts from the release for at least one repaired task per category.}
+
+\begin{table*}[t]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.11\textwidth}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.30\textwidth}@{}}
+\toprule
+Category & Task & Before & After \\
+\midrule
+Unstated test requirement & flipt & \texttt{TestLoad} reads three YAML samples (\texttt{otlp.yml} with \texttt{samplingRatio} set to 0.5, \texttt{wrong\_sampling\_ratio.yml} and \texttt{wrong\_propagator.yml}) that exist only in the reference patch; the instruction never mentions them. & Repaired: the instruction specifies all three files. \\
+\addlinespace
+ & vuls & The instruction says to fall back to the bundle directory name. Two agent configurations did so and reported \texttt{Sample.app}, but the graded test expects \texttt{Sample} because the reference patch strips the suffix. & Repaired: the instruction states that the \texttt{.app} suffix is removed. \\
+\addlinespace
+ & qutebrowser & A graded test reads the private attribute \texttt{\_values}. & Discarded: stating it would dictate the implementation. \\
+\addlinespace
+Spec--test contradiction & vuls & The instruction says a package is \emph{not affected} when exactly one of the package and the OVAL definition carries a modularity label, but four pre-existing graded cases require the legacy fallback to the host's enabled modules. & Repaired: the instruction states the fallback, which the reference patch keeps. \\
+\addlinespace
+ & webclients & The interface declares an \texttt{Element} argument, while the graded test passes a \texttt{Document}. & Discarded: the fix lies in the tests. \\
+\addlinespace
+Solution leakage & tutanota & The instruction tells the agent to update the try-catch block around \texttt{aes256Decrypt} in \texttt{decrypt}. & Repaired: behaviour only. A \texttt{CryptoError} raised by the crypto library must surface as the application's own \texttt{CryptoError}, which the credentials layer converts to \texttt{KeyPermanentlyInvalidatedError}. \\
+\addlinespace
+Insufficient tests & flipt & The graded tests cover only the error paths of a new cache layer, so a \texttt{getJSON} that always returns false and a no-op \texttt{setJSON} pass. & Discarded: engineers did not write new tests. \\
+\addlinespace
+ & vuls & No graded test checks an image reference that carries both a tag and a digest. & Repaired: one assertion added that expects an error for such a reference. \\
+\addlinespace
+Verifier defect & 16 tasks & The fail-to-pass list names a whole file (e.g.\ \texttt{Calendar\-Utils\-Test.js~|~test~suite}), so any unrelated or flaky failure in that file fails a correct patch. & Discarded. \\
+\addlinespace
+Environment defect & teleport & SoftHSM is missing from the image, so a graded test is skipped, and the verifier scores the skip as a failure. & Discarded. \\
+\bottomrule
+\end{tabularx}
+\caption{Representative defects by category, paraphrased from the task artifacts, and their resolution.}
+\label{tab:examples}
+\end{table*}
+
+\section{Catalogue of Evaluation Exploits}
+\label{app:exploits}
+Table~\ref{tab:exploits} lists every route to an unearned pass that we observed in agent runs, found in community reports, or constructed ourselves, together with the countermeasure in the locked protocol (\S\ref{sec:protocol}). Table~\ref{tab:flips} gives the individual forgeries.
+\todo{Add two or three short trajectory excerpts (a network attempt under the lock, a forged \texttt{go.sum}, an imitation SDK) showing the commands the agents ran.}
+
+\begin{table*}[t]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.30\textwidth}@{}}
+\toprule
+Exploit & What we saw & Countermeasure \\
+\midrule
+Fetching the fix from code hosts & With the network open, \netTrajOpen{} of \nTasks{} Opus~5 runs contacted code hosts and \netOwnRepoOpen{} downloaded the task's own repository; \webFetchTrajOpen{} used the scaffold's web-fetch tool, \webFetchOwnOpen{} of them on their own repository. & Only the model endpoint is reachable in the agent phase; scaffold web tools are disabled; the lock is probed before every run. \\
+\addlinespace
+Recovering the fix from git history & Future commits left in task images leaked fixes in SWE-bench and SWE-Bench Pro \citep{kahn2025repostate,needham2025prostate,adams2026gitreward}. & All \probeImages{} images contain neither the fixing commit nor reflog entries, stashes or dangling objects; re-checked by the probe. \\
+\addlinespace
+Tunnelling through the model endpoint & Gemini disguised a request to the Go module proxy as model-endpoint traffic. & The allowlist names the endpoint hostname alone, and the endpoint relays no other traffic; all tool calls are audited. \\
+\addlinespace
+Forging dependencies outside the patch & Opus~5 forged \texttt{goval-dictionary v0.9.5}, serving it from a file-based \texttt{GOPROXY} with a fabricated \texttt{go.sum} entry, and Inkling forged the same version from an older cached module; Gemini fabricated \texttt{go.sum} and \texttt{go.work.sum} entries. & Fresh-container re-grade: the pristine image fails the checksum. \\
+\addlinespace
+Editing shared caches in place & Inkling edited a cached dependency with \texttt{sed -i}, and elsewhere made the module cache writable and added a file to it; Gemini edited the module cache in place. & Fresh-container re-grade: caches do not carry over. \\
+\addlinespace
+Tampering with the grader & A scripted agent that replaces \texttt{python3} with a script printing \textsc{PASSED} scores an empty patch 1 under in-sandbox grading. Not observed from any model. & Fresh-container re-grade: binaries do not carry over. \\
+\addlinespace
+Changing graded test files & Agents edited snapshots and test data that the hidden test patch owns (in 44 runs this made the patch fail to apply), and a \texttt{git stash} round trip left stale bytecode that the verifier imported. & Test files, test data and bytecode are reset before grading (\S\ref{sec:verifier}). \\
+\addlinespace
+Imitating a missing SDK inside the patch & On the never-public set, three systems wrote an imitation SDK into the patch for two tasks whose images lack it; \nFakeSDK{} passes, because the tests mock the client. & Not caught by re-grading; the patch audit flags large new directories that imitate a third-party SDK. \\
+\addlinespace
+Reading hidden tests or the reference & On the never-public set, the verifier configuration carried the reference and test patches. & Removed from the bundle; trajectories are audited for reads of \texttt{/tests} and \texttt{/solution}. \\
+\bottomrule
+\end{tabularx}
+\caption{Routes to an unearned pass and how the locked protocol handles them.}
+\label{tab:exploits}
+\end{table*}
+
 \section{The Hard Split}
 \label{app:hard}
 The \nHard{} tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families (Opus~5, GLM-5.3, Kimi K3, Inkling, Gemini~3.8 Flash) failed it. That gave \nHardCandidates{} candidates after excluding \nHardDefectDrop{} tasks with verified defects, and \nHardAuditDrop{} more were removed after review. Every Hard task passes with its reference solution and fails with an empty patch. Readers should know four things about the released list.
@@ -25,4 +95,24 @@ The \nPriv{} tasks come from \nPrivOrgs{} organisations (\nPrivGo{} in Go, the r
 \paragraph{Harness.} Upstream Harbor \harborVersion{} on Modal \modalVersion{}. The network is set per phase: public during setup, only the model endpoint during the agent phase, public again for the verifier, because \nNeedNet{} tasks download dependencies while testing.
 \paragraph{Scaffolds.} Claude Code \ccVersion{} on the public runs and 2.1.283 on the private runs, with web tools disabled. Codex \codexVersion{}, with hosted web search disabled. mini-swe-agent 2.4.6, with no step or cost limit, so the time budget binds.
 \paragraph{Budget and grading.} The budget is 3000\,s per task. The agent is stopped at 2940\,s, and the patch present then is graded. The patch is the staged \texttt{git diff} of the working tree. It is applied to a fresh container built from the task image, with a three-way fallback, and the unchanged verifier runs. When the sandbox grade and the clean grade disagree, two more clean grades are taken and the majority of the three clean grades counts.
+\paragraph{Cost.} Mean API spend per task on V2 was \costClaudeCode{} for the Claude Code runs, \costAstra{} for Astra and \costGemini{} for Gemini.
 \paragraph{Release.} Task directories, the Hard split, the probe, capture and re-grade scripts, the exact harness flags, and per-task grades in both modes for every run.
+
+\section{Harness Study (Preliminary)}
+\label{app:harness}
+\todo{Placeholder for the harness comparison of \S\ref{sec:harness}.}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+Model & mini-swe-agent & Pi & OpenCode \\
+\midrule
+GLM-5.3 & \hardGlmMini & \hardGlmPi & \hardGlmOpencode \\
+Kimi K3 & \hardKimiMini & \hardKimiPi & \hardKimiOpencode \\
+Inkling & \hardInklingMini & \hardInklingPi & \hardInklingOpencode \\
+\bottomrule
+\end{tabular}
+\caption{Hard tasks resolved (of \nHard) by model and harness under the locked protocol. \todo{Preliminary team runs; confirm before submission.}}
+\label{tab:harness}
+\end{table}

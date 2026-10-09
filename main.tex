@@ -1,6 +1,10 @@
 \PassOptionsToPackage{hyphens}{url}
 \documentclass[11pt]{article}
-\usepackage[preprint]{acl}
+% NAACL 2027 Industry Track: official *ACL template (acl.sty / acl_natbib.bst from
+% github.com/acl-org/acl-style-files). The track is double-blind, so submit with [review].
+% Use [preprint] for a non-anonymous arXiv version and [final] for the camera-ready.
+% Limits: 6 pages of content; Limitations, Ethics, references and appendices do not count.
+\usepackage[review]{acl}
 \usepackage{times}
 \usepackage{latexsym}
 \usepackage[T1]{fontenc}
@@ -13,7 +17,6 @@
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{pifont}
-\usepackage{booktabs}
 \usepackage{tabularx}
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
@@ -21,8 +24,9 @@
 \input{tables/numbers}
 \sloppy
 \newcommand{\dyz}[1]{\textcolor{red}{[Daniel: #1]}}
+\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
 
-\title{SWE-Bench Pro v2: A Cleaner, Harder-to-Game Coding Benchmark}
+\title{SWE-Bench Pro V2: A Cleaner, Harder-to-Game Coding Benchmark}
 \author{Soham Dan, Jeff Da, Sanyam Bhutani, Miguel Romero...TBD, ..., Ying Liu, Daniel Yue Zhang}
 
 \begin{document}
@@ -32,9 +36,10 @@
 \input{sections/02_related}
 \input{sections/03_method}
 \input{sections/04_experiments}
-\input{sections/05_conclusion}
-%\input{sections/06_limitations}
+\input{sections/05_discussion}
+\input{sections/06_conclusion}
+\input{sections/07_limitations}
 \bibliography{refs}
-%\appendix
-%\input{appendix/A_appendix}
+\appendix
+\input{appendix/A_appendix}
 \end{document}
